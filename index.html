@@ -1,180 +1,313 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tamagotchi Game</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mini Tamagotchi Game</title>
   <style>
-    body {
+    * {
+      box-sizing: border-box;
       margin: 0;
+      padding: 0;
+    }
+
+    body {
       min-height: 100vh;
-      background: linear-gradient(135deg, #ffd6e8, #b8ecff);
-      font-family: Arial, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
-      color: #222;
+      background: linear-gradient(135deg, #ffe6f2, #dff7ff);
+      font-family: Arial, Helvetica, sans-serif;
+      color: #333;
     }
 
-    .game {
+    .game-wrapper {
       width: 360px;
       max-width: 92vw;
-      background: #ff7abf;
-      border: 5px solid white;
-      border-radius: 35px;
-      padding: 20px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+      background: #fff8fd;
+      border: 6px solid #ff8fc7;
+      border-radius: 36px;
+      padding: 22px;
+      box-shadow: 0 18px 40px rgba(255, 105, 180, 0.25);
+      text-align: center;
+      position: relative;
     }
 
-    h1 {
-      text-align: center;
-      color: white;
-      margin: 0 0 15px;
-      text-shadow: 2px 2px #c94b91;
+    .title {
+      font-size: 26px;
+      margin-bottom: 14px;
+      color: #ff4fa3;
+      letter-spacing: 1px;
     }
 
     .screen {
-      background: #eafff7;
-      border: 5px solid #333;
+      background: #c9f7d5;
+      border: 5px solid #3f7f5f;
       border-radius: 22px;
-      padding: 15px;
+      padding: 18px 12px;
+      min-height: 260px;
+      box-shadow: inset 0 4px 10px rgba(0,0,0,0.15);
+      position: relative;
+      overflow: hidden;
     }
 
-    .message {
+    .sky-decoration {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.65;
+    }
+
+    .cloud {
+      position: absolute;
       background: white;
-      border: 3px solid #333;
-      border-radius: 12px;
-      min-height: 45px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      font-weight: bold;
-      padding: 8px;
-      margin-bottom: 12px;
+      border-radius: 999px;
+      width: 58px;
+      height: 18px;
+    }
+
+    .cloud::before,
+    .cloud::after {
+      content: "";
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+    }
+
+    .cloud::before {
+      width: 26px;
+      height: 26px;
+      left: 8px;
+      top: -13px;
+    }
+
+    .cloud::after {
+      width: 32px;
+      height: 32px;
+      right: 7px;
+      top: -17px;
+    }
+
+    .cloud.one {
+      top: 28px;
+      left: 22px;
+    }
+
+    .cloud.two {
+      top: 62px;
+      right: 24px;
+      transform: scale(0.8);
     }
 
     .pet-area {
-      height: 170px;
-      background: linear-gradient(#a9efff 0 65%, #9ee67a 65% 100%);
-      border: 4px solid #333;
-      border-radius: 18px;
+      height: 130px;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-end;
+      margin-top: 28px;
       position: relative;
-      overflow: hidden;
-      margin-bottom: 15px;
-    }
-
-    .sun {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      width: 35px;
-      height: 35px;
-      background: #ffe45c;
-      border-radius: 50%;
-      border: 3px solid #333;
-    }
-
-    .poop {
-      position: absolute;
-      left: 35px;
-      bottom: 25px;
-      font-size: 28px;
-      display: none;
-    }
-
-    .zzz {
-      position: absolute;
-      top: 40px;
-      right: 90px;
-      font-size: 24px;
-      font-weight: bold;
-      color: blue;
-      display: none;
+      z-index: 2;
     }
 
     .pet {
-      width: 95px;
-      height: 95px;
-      background: #ffd166;
-      border: 5px solid #333;
-      border-radius: 45% 45% 50% 50%;
+      width: 104px;
+      height: 104px;
+      background: #fff36d;
+      border: 4px solid #333;
+      border-radius: 52% 48% 46% 54%;
       position: relative;
-      animation: bounce 1s infinite ease-in-out;
+      animation: bounce 1.2s infinite ease-in-out;
+      transition: 0.25s ease;
     }
 
     .pet.sick {
-      background: #9fd39a;
+      background: #b9e8aa;
+      animation: wobble 0.8s infinite;
     }
 
     .pet.sleeping {
-      background: #aaa7ff;
-      animation: none;
+      background: #d8c4ff;
+      animation: sleepBob 2s infinite ease-in-out;
     }
 
     .pet.dead {
-      background: #aaa;
+      background: #bdbdbd;
       animation: none;
       transform: rotate(8deg);
     }
 
     .ear {
       position: absolute;
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 34px;
       background: inherit;
-      border: 5px solid #333;
-      top: -20px;
+      border: 4px solid #333;
+      top: -18px;
       z-index: -1;
     }
 
     .ear.left {
-      left: 10px;
-      border-radius: 70% 20% 50% 20%;
-      transform: rotate(-25deg);
+      left: 15px;
+      border-radius: 70% 30% 40% 60%;
+      transform: rotate(-22deg);
     }
 
     .ear.right {
-      right: 10px;
-      border-radius: 20% 70% 20% 50%;
-      transform: rotate(25deg);
+      right: 15px;
+      border-radius: 30% 70% 60% 40%;
+      transform: rotate(22deg);
     }
 
     .eye {
       position: absolute;
-      top: 34px;
       width: 12px;
       height: 15px;
-      background: #222;
+      background: #333;
       border-radius: 50%;
+      top: 38px;
     }
 
-    .eye.left { left: 25px; }
-    .eye.right { right: 25px; }
+    .eye.left { left: 28px; }
+    .eye.right { right: 28px; }
+
+    .pet.sleeping .eye,
+    .pet.dead .eye {
+      height: 4px;
+      border-radius: 999px;
+      top: 43px;
+    }
 
     .mouth {
       position: absolute;
+      width: 28px;
+      height: 15px;
+      border-bottom: 4px solid #333;
+      border-radius: 0 0 50px 50px;
       left: 50%;
-      top: 60px;
-      width: 25px;
-      height: 12px;
-      border-bottom: 4px solid #222;
-      border-radius: 0 0 20px 20px;
       transform: translateX(-50%);
+      top: 60px;
     }
 
-    .dead .eye {
+    .pet.sick .mouth {
+      border-bottom: none;
+      border-top: 4px solid #333;
+      border-radius: 50px 50px 0 0;
+      top: 68px;
+    }
+
+    .pet.dead .mouth {
+      border-bottom: none;
+      width: 24px;
       height: 4px;
-      top: 40px;
+      background: #333;
+      top: 68px;
     }
 
-    .dead .mouth {
-      border-bottom: 0;
-      border-top: 4px solid #222;
-      border-radius: 20px 20px 0 0;
+    .status-text {
+      position: relative;
+      z-index: 2;
+      min-height: 24px;
+      margin: 10px 0 14px;
+      font-weight: bold;
+      color: #24513b;
+    }
+
+    .bars {
+      display: grid;
+      gap: 8px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 72px 1fr 34px;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .bar-bg {
+      height: 14px;
+      background: rgba(255,255,255,0.65);
+      border: 2px solid #3f7f5f;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: 100%;
+      background: #48c774;
+      transition: width 0.2s linear, background 0.2s linear;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    button {
+      border: none;
+      border-radius: 16px;
+      padding: 12px 8px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      background: #ff8fc7;
+      color: white;
+      box-shadow: 0 4px 0 #d94f94;
+      transition: transform 0.08s, box-shadow 0.08s, opacity 0.2s;
+    }
+
+    button:hover {
+      opacity: 0.92;
+    }
+
+    button:active {
+      transform: translateY(4px);
+      box-shadow: 0 0 0 #d94f94;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .reset-button {
+      grid-column: span 2;
+      background: #5b8def;
+      box-shadow: 0 4px 0 #3260bd;
+    }
+
+    .info {
+      margin-top: 14px;
+      font-size: 13px;
+      color: #777;
+      line-height: 1.4;
+    }
+
+    .floating-message {
+      position: absolute;
+      left: 50%;
+      top: 92px;
+      transform: translateX(-50%);
+      background: white;
+      color: #ff4fa3;
+      border: 3px solid #ff8fc7;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-weight: bold;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    .floating-message.show {
+      animation: popMessage 1s ease;
     }
 
     @keyframes bounce {
@@ -182,87 +315,38 @@
       50% { transform: translateY(-8px); }
     }
 
-    .info {
-      display: flex;
-      justify-content: space-between;
-      font-weight: bold;
-      margin-bottom: 10px;
+    @keyframes wobble {
+      0%, 100% { transform: rotate(-3deg); }
+      50% { transform: rotate(3deg); }
     }
 
-    .stat {
-      margin-bottom: 8px;
-      font-weight: bold;
-      font-size: 14px;
+    @keyframes sleepBob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(4px); }
     }
 
-    .stat-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 3px;
-    }
-
-    .bar {
-      width: 100%;
-      height: 16px;
-      background: #ddd;
-      border: 2px solid #333;
-      border-radius: 20px;
-      overflow: hidden;
-    }
-
-    .fill {
-      height: 100%;
-      width: 50%;
-      background: #52d96b;
-      transition: width 0.2s;
-    }
-
-    .buttons {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    button {
-      background: #fff59d;
-      border: 3px solid #333;
-      border-radius: 12px;
-      padding: 10px 6px;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 4px 0 #333;
-    }
-
-    button:active {
-      transform: translateY(4px);
-      box-shadow: none;
-    }
-
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .reset {
-      background: #c8f1ff;
-      grid-column: span 2;
+    @keyframes popMessage {
+      0% { opacity: 0; transform: translate(-50%, 10px) scale(0.9); }
+      20% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+      80% { opacity: 1; transform: translate(-50%, -8px) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -18px) scale(0.95); }
     }
   </style>
 </head>
 <body>
-  <div class="game">
-    <h1>Tamagotchi</h1>
+  <main class="game-wrapper">
+    <h1 class="title">Tamagotchi</h1>
 
-    <div class="screen">
-      <div class="message" id="message">Hello! Take care of me!</div>
+    <section class="screen">
+      <div class="sky-decoration">
+        <div class="cloud one"></div>
+        <div class="cloud two"></div>
+      </div>
+
+      <div id="floatingMessage" class="floating-message">Yay!</div>
 
       <div class="pet-area">
-        <div class="sun"></div>
-        <div class="poop" id="poop">💩</div>
-        <div class="zzz" id="zzz">Zzz</div>
-
-        <div class="pet" id="pet">
+        <div id="pet" class="pet">
           <div class="ear left"></div>
           <div class="ear right"></div>
           <div class="eye left"></div>
@@ -271,246 +355,225 @@
         </div>
       </div>
 
-      <div class="info">
-        <span id="stage">Baby</span>
-        <span id="age">Age: 0</span>
-      </div>
+      <p id="statusText" class="status-text">Your pet is happy!</p>
 
-      <div class="stat">
-        <div class="stat-row"><span>Hunger</span><span id="hungerText">80</span></div>
-        <div class="bar"><div class="fill" id="hungerBar"></div></div>
+      <div class="bars">
+        <div class="bar-row">
+          <span>Hunger</span>
+          <div class="bar-bg"><div id="hungerBar" class="bar-fill"></div></div>
+          <span id="hungerValue">100</span>
+        </div>
+        <div class="bar-row">
+          <span>Happy</span>
+          <div class="bar-bg"><div id="happyBar" class="bar-fill"></div></div>
+          <span id="happyValue">100</span>
+        </div>
+        <div class="bar-row">
+          <span>Energy</span>
+          <div class="bar-bg"><div id="energyBar" class="bar-fill"></div></div>
+          <span id="energyValue">100</span>
+        </div>
+        <div class="bar-row">
+          <span>Clean</span>
+          <div class="bar-bg"><div id="cleanBar" class="bar-fill"></div></div>
+          <span id="cleanValue">100</span>
+        </div>
       </div>
+    </section>
 
-      <div class="stat">
-        <div class="stat-row"><span>Happiness</span><span id="happyText">80</span></div>
-        <div class="bar"><div class="fill" id="happyBar"></div></div>
-      </div>
+    <section class="buttons">
+      <button id="feedButton">🍙 Feed</button>
+      <button id="playButton">🎾 Play</button>
+      <button id="sleepButton">💤 Sleep</button>
+      <button id="cleanButton">🛁 Clean</button>
+      <button id="resetButton" class="reset-button">🔄 Restart</button>
+    </section>
 
-      <div class="stat">
-        <div class="stat-row"><span>Energy</span><span id="energyText">80</span></div>
-        <div class="bar"><div class="fill" id="energyBar"></div></div>
-      </div>
-
-      <div class="stat">
-        <div class="stat-row"><span>Cleanliness</span><span id="cleanText">80</span></div>
-        <div class="bar"><div class="fill" id="cleanBar"></div></div>
-      </div>
-
-      <div class="stat">
-        <div class="stat-row"><span>Health</span><span id="healthText">100</span></div>
-        <div class="bar"><div class="fill" id="healthBar"></div></div>
-      </div>
-
-      <div class="buttons">
-        <button onclick="feedPet()">🍙 Feed</button>
-        <button onclick="playPet()">🎾 Play</button>
-        <button onclick="sleepPet()">🌙 Sleep</button>
-        <button onclick="cleanPet()">🧼 Clean</button>
-        <button onclick="giveMedicine()">💊 Medicine</button>
-        <button onclick="giveSnack()">🍓 Snack</button>
-        <button class="reset" onclick="resetGame()">🔄 Reset Game</button>
-      </div>
-    </div>
-  </div>
+    <p class="info">Keep your pet fed, happy, rested, and clean. If any stat reaches 0, your pet gives up!</p>
+  </main>
 
   <script>
-    var hunger = 80;
-    var happiness = 80;
-    var energy = 80;
-    var cleanliness = 80;
-    var health = 100;
-    var age = 0;
-    var ticks = 0;
-    var sleeping = false;
-    var hasPoop = false;
-    var alive = true;
+    const pet = document.getElementById("pet");
+    const statusText = document.getElementById("statusText");
+    const floatingMessage = document.getElementById("floatingMessage");
 
-    var message = document.getElementById("message");
-    var pet = document.getElementById("pet");
-    var poop = document.getElementById("poop");
-    var zzz = document.getElementById("zzz");
+    const feedButton = document.getElementById("feedButton");
+    const playButton = document.getElementById("playButton");
+    const sleepButton = document.getElementById("sleepButton");
+    const cleanButton = document.getElementById("cleanButton");
+    const resetButton = document.getElementById("resetButton");
 
-    function clamp(value) {
-      if (value < 0) return 0;
-      if (value > 100) return 100;
-      return Math.round(value);
+    const bars = {
+      hunger: document.getElementById("hungerBar"),
+      happy: document.getElementById("happyBar"),
+      energy: document.getElementById("energyBar"),
+      clean: document.getElementById("cleanBar")
+    };
+
+    const values = {
+      hunger: document.getElementById("hungerValue"),
+      happy: document.getElementById("happyValue"),
+      energy: document.getElementById("energyValue"),
+      clean: document.getElementById("cleanValue")
+    };
+
+    let stats;
+    let isDead;
+    let isSleeping;
+    let gameTimer;
+
+    function startGame() {
+      stats = {
+        hunger: 100,
+        happy: 100,
+        energy: 100,
+        clean: 100
+      };
+
+      isDead = false;
+      isSleeping = false;
+
+      clearInterval(gameTimer);
+      gameTimer = setInterval(gameTick, 1000);
+      updateDisplay();
+      showMessage("Hello!");
     }
 
-    function setMessage(text) {
-      message.textContent = text;
+    function clamp(value) {
+      return Math.max(0, Math.min(100, value));
+    }
+
+    function changeStat(name, amount) {
+      stats[name] = clamp(stats[name] + amount);
+    }
+
+    function gameTick() {
+      if (isDead) return;
+
+      if (isSleeping) {
+        changeStat("energy", 8);
+        changeStat("hunger", -3);
+        changeStat("clean", -2);
+
+        if (stats.energy >= 100) {
+          isSleeping = false;
+          showMessage("Awake!");
+        }
+      } else {
+        changeStat("hunger", -4);
+        changeStat("happy", -3);
+        changeStat("energy", -2);
+        changeStat("clean", -2);
+      }
+
+      if (stats.hunger <= 0 || stats.happy <= 0 || stats.energy <= 0 || stats.clean <= 0) {
+        isDead = true;
+        clearInterval(gameTimer);
+      }
+
+      updateDisplay();
     }
 
     function updateDisplay() {
-      hunger = clamp(hunger);
-      happiness = clamp(happiness);
-      energy = clamp(energy);
-      cleanliness = clamp(cleanliness);
-      health = clamp(health);
+      Object.keys(stats).forEach(name => {
+        bars[name].style.width = stats[name] + "%";
+        values[name].textContent = stats[name];
 
-      document.getElementById("hungerText").textContent = hunger;
-      document.getElementById("happyText").textContent = happiness;
-      document.getElementById("energyText").textContent = energy;
-      document.getElementById("cleanText").textContent = cleanliness;
-      document.getElementById("healthText").textContent = health;
-
-      document.getElementById("hungerBar").style.width = hunger + "%";
-      document.getElementById("happyBar").style.width = happiness + "%";
-      document.getElementById("energyBar").style.width = energy + "%";
-      document.getElementById("cleanBar").style.width = cleanliness + "%";
-      document.getElementById("healthBar").style.width = health + "%";
-
-      document.getElementById("age").textContent = "Age: " + age;
-
-      if (age < 3) {
-        document.getElementById("stage").textContent = "Baby";
-      } else if (age < 7) {
-        document.getElementById("stage").textContent = "Teen";
-      } else {
-        document.getElementById("stage").textContent = "Adult";
-      }
-
-      poop.style.display = hasPoop ? "block" : "none";
-      zzz.style.display = sleeping && alive ? "block" : "none";
+        if (stats[name] <= 25) {
+          bars[name].style.background = "#ff5a5a";
+        } else if (stats[name] <= 55) {
+          bars[name].style.background = "#ffb84d";
+        } else {
+          bars[name].style.background = "#48c774";
+        }
+      });
 
       pet.className = "pet";
-      if (!alive) {
-        pet.className = "pet dead";
-      } else if (sleeping) {
-        pet.className = "pet sleeping";
-      } else if (health < 35) {
-        pet.className = "pet sick";
-      }
-    }
 
-    function feedPet() {
-      if (!alive || sleeping) return;
-      hunger += 18;
-      happiness += 2;
-      cleanliness -= 4;
-      if (Math.random() < 0.3) hasPoop = true;
-      setMessage("Yum! Your pet ate food.");
-      updateDisplay();
-    }
-
-    function giveSnack() {
-      if (!alive || sleeping) return;
-      hunger += 8;
-      happiness += 15;
-      health -= 4;
-      if (Math.random() < 0.2) hasPoop = true;
-      setMessage("Sweet snack! Happy pet!");
-      updateDisplay();
-    }
-
-    function playPet() {
-      if (!alive || sleeping) return;
-      if (energy < 15) {
-        setMessage("Too tired to play!");
+      if (isDead) {
+        pet.classList.add("dead");
+        statusText.textContent = "Oh no... your pet gave up. Restart?";
+        setButtonsDisabled(true);
         return;
       }
-      happiness += 18;
-      energy -= 15;
-      hunger -= 8;
-      cleanliness -= 6;
-      setMessage("That was fun!");
-      updateDisplay();
-    }
 
-    function sleepPet() {
-      if (!alive) return;
-      sleeping = !sleeping;
-      if (sleeping) {
-        setMessage("Your pet is sleeping.");
+      setButtonsDisabled(false);
+
+      if (isSleeping) {
+        pet.classList.add("sleeping");
+        statusText.textContent = "Your pet is sleeping... Zzz";
+        return;
+      }
+
+      const lowestStat = Math.min(stats.hunger, stats.happy, stats.energy, stats.clean);
+
+      if (lowestStat <= 25) {
+        pet.classList.add("sick");
+        statusText.textContent = getWarningText();
+      } else if (lowestStat <= 55) {
+        statusText.textContent = "Your pet needs attention.";
       } else {
-        energy += 20;
-        setMessage("Your pet woke up!");
+        statusText.textContent = "Your pet is happy!";
       }
-      updateDisplay();
     }
 
-    function cleanPet() {
-      if (!alive || sleeping) return;
-      cleanliness += 25;
-      happiness += 3;
-      hasPoop = false;
-      setMessage("All clean now!");
-      updateDisplay();
+    function getWarningText() {
+      if (stats.hunger <= 25) return "Your pet is starving!";
+      if (stats.happy <= 25) return "Your pet feels lonely!";
+      if (stats.energy <= 25) return "Your pet is exhausted!";
+      if (stats.clean <= 25) return "Your pet is dirty!";
+      return "Your pet needs help!";
     }
 
-    function giveMedicine() {
-      if (!alive || sleeping) return;
-      health += 20;
-      happiness -= 5;
-      setMessage("Medicine taken. Health improved!");
-      updateDisplay();
+    function setButtonsDisabled(disabled) {
+      feedButton.disabled = disabled;
+      playButton.disabled = disabled;
+      sleepButton.disabled = disabled;
+      cleanButton.disabled = disabled;
     }
 
-    function resetGame() {
-      hunger = 80;
-      happiness = 80;
-      energy = 80;
-      cleanliness = 80;
-      health = 100;
-      age = 0;
-      ticks = 0;
-      sleeping = false;
-      hasPoop = false;
-      alive = true;
-      setMessage("New pet! Take care of it!");
-      updateDisplay();
+    function showMessage(text) {
+      floatingMessage.textContent = text;
+      floatingMessage.classList.remove("show");
+      void floatingMessage.offsetWidth;
+      floatingMessage.classList.add("show");
     }
 
-    function gameLoop() {
-      if (!alive) return;
-
-      ticks++;
-
-      if (sleeping) {
-        energy += 6;
-        health += 1;
-        hunger -= 1;
-        happiness -= 0.5;
-      } else {
-        hunger -= 2;
-        happiness -= 1.5;
-        energy -= 1.5;
-        cleanliness -= 1;
-      }
-
-      if (hasPoop) cleanliness -= 2;
-
-      if (hunger < 25) health -= 3;
-      if (cleanliness < 25) health -= 2;
-      if (happiness < 20) health -= 1;
-      if (energy < 15 && !sleeping) health -= 1;
-
-      if (!hasPoop && Math.random() < 0.04) {
-        hasPoop = true;
-        setMessage("Oh no! Your pet made a mess.");
-      }
-
-      if (ticks % 8 === 0) {
-        age++;
-        setMessage("Your pet grew older!");
-      }
-
-      if (hunger <= 0 || health <= 0) {
-        alive = false;
-        sleeping = false;
-        setMessage("Game over. Your pet needs better care next time.");
-      } else if (health < 35) {
-        setMessage("Your pet feels sick. Use medicine!");
-      } else if (hunger < 25) {
-        setMessage("Your pet is hungry!");
-      } else if (energy < 20 && !sleeping) {
-        setMessage("Your pet is tired.");
-      }
-
+    feedButton.addEventListener("click", () => {
+      if (isDead || isSleeping) return;
+      changeStat("hunger", 22);
+      changeStat("clean", -4);
+      showMessage("Yummy!");
       updateDisplay();
-    }
+    });
 
-    updateDisplay();
-    setInterval(gameLoop, 3000);
+    playButton.addEventListener("click", () => {
+      if (isDead || isSleeping) return;
+      changeStat("happy", 24);
+      changeStat("energy", -12);
+      changeStat("hunger", -7);
+      showMessage("Fun!");
+      updateDisplay();
+    });
+
+    sleepButton.addEventListener("click", () => {
+      if (isDead) return;
+      isSleeping = true;
+      showMessage("Zzz...");
+      updateDisplay();
+    });
+
+    cleanButton.addEventListener("click", () => {
+      if (isDead || isSleeping) return;
+      changeStat("clean", 28);
+      changeStat("happy", 4);
+      showMessage("Fresh!");
+      updateDisplay();
+    });
+
+    resetButton.addEventListener("click", startGame);
+
+    startGame();
   </script>
 </body>
 </html>
